@@ -9,7 +9,8 @@ class Home extends Component {
       flag: true,
       line: [],
       draw: null,
-      strokeCircleColor: ''
+      strokeCircleColor: '',
+      isClicked: true
     }
   }
   componentDidMount () {
@@ -33,14 +34,20 @@ class Home extends Component {
 
   }
   menuClickHandler () {
-    let loadingCircle = this.state.draw.select('.circle')
-    let circumf = Math.PI * (loadingCircle.attr('r') * 2)
-    this.state.draw.select('#items').animate({ transform: 's1 1' }, 1500, mina.elastic )
-    loadingCircle.animate({ transform: 's0 0' }, 1000, mina.elastic )
-    loadingCircle.attr({ 'stroke-dashoffset': circumf })   
+    if (this.state.isClicked) {
+      this.setState({isClicked: false})
+      let loadingCircle = this.state.draw.select('.circle')
+      let circumf = Math.PI * (loadingCircle.attr('r') * 2)
+      this.state.draw.select('#items').animate({ transform: 's1 1' }, 1500, mina.elastic )
+      loadingCircle.animate({ transform: 's0 0' }, 1000, mina.elastic, () => {
+        this.setState({isClicked: false})
+      })
+      loadingCircle.attr({ 'stroke-dashoffset': circumf })
+    }
   }
 
   setStrokeColorSircle (event) {
+    this.setState({isClicked: false})
     let strokeCircle
     switch (event.target.className.animVal) {
     case 'st0':
@@ -66,10 +73,10 @@ class Home extends Component {
     }
     let loadingCircle = this.state.draw.select('.circle').attr({stroke: strokeCircle})
     let circumf = Math.PI * (loadingCircle.attr('r') * 2)
-    
+
     this.state.draw.select('#items').animate({ transform: 's0 0' }, 100, mina.easein, () => {
       this.state.draw.select('#menu').animate({ transform: 's0 0' }, 100, mina.easein, () => {
-        this.state.draw.select('.st6').attr({stroke: strokeCircle})        
+        this.state.draw.select('.st6').attr({stroke: strokeCircle})
       })
     })
     loadingCircle.animate({ transform: 's1 1' }, 100, mina.easeinout)
@@ -80,7 +87,8 @@ class Home extends Component {
       loadingCircle.animate({ transform: 's0 0' }, 100, mina.easeinout, () => {
         this.state.draw.select('#menu').animate({ transform: 's1 1' }, 1000, mina.bounce, () => {
           loadingCircle.attr({ 'stroke-dashoffset': circumf })
-        })        
+          this.setState({isClicked: true})
+        })
       })
     })
   }
