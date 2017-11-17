@@ -19,19 +19,34 @@ class Home extends Component {
       open: false
     }
   }
-  hendleInputChenge (e) {
-    for (var i = 0; i < e.target.files.length; i++) {
-      this.setState({
-        items: this.state.items.concat(URL.createObjectURL(e.target.files[i]))
-      })
-      e.target.files[i]
+  handleInputChange (e) {
+    let items = []
+    for (let i = 0; i < e.target.files.length; i++) {
+      let item = {
+        id: i,
+        blob: URL.createObjectURL(e.target.files[i]),
+        name: e.target.files[i].name,
+        checked: false
+      }
+      items.push(item)
     }
     this.setState({
+      items: items,
       open: true
     })
   }
   handleRequestClose () {
     this.setState({ open: false })
+  }
+  handleCheckBox (id) {
+    this.setState({
+      items: this.state.items.map(item => {
+        if (item.id === id) {
+          item.checked = !item.checked
+        }
+        return item
+      })
+    })
   }
 
   render () {
@@ -43,8 +58,6 @@ class Home extends Component {
         display: 'none'
       }
     }
-
-    console.log(this.state.items);
     return (
       <div id='home'>
         <AppBar position='static' color='default'>
@@ -57,8 +70,7 @@ class Home extends Component {
         <div className='main'>
           <div className='main-item'>
             <p>Будь ласка  натисніть на конопку аби вибрати картинки для слайд-шоу</p>
-
-            <input base64 onChange={e => this.hendleInputChenge(e)} accept='jpg,jpeg,JPG,JPEG' style={classes.input} id='file' multiple type='file' />
+            <input onChange={e => this.handleInputChange(e)} accept='jpg,jpeg,JPG,JPEG' style={classes.input} id='file' multiple type='file' />
             <label htmlFor='file'>
               <Button raised component='span' className='main-item-button'>
                 Upload
@@ -72,9 +84,10 @@ class Home extends Component {
             <DialogContentText>
               {this.state.items.map((item, index) => {
                 return (
-                  <div style={{display: 'flex'}}>
-                    <img style={{width: '100px', height: '100px'}} src={item} />
-                    <p>{item}</p>
+                  <div className='Person' key={index}>
+                    <input onChange={() => this.handleCheckBox(item.id)} type='checkbox' checked={item.checked} />
+                    <img style={{width: '100px', height: '100px'}} src={item.blob} />
+                    <div className='Person-caption'>{item.name}</div>
                   </div>
                 )
               })}
